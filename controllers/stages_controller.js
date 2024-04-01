@@ -1,13 +1,13 @@
 const stages = require("express").Router();
 const db = require("../models");
-const { Stage, MeetGreet, Event, SetTime, Sequelize } = db;
+const { Stage, MeetGreet, SetTime, Sequelize } = db;
 const { Op } = Sequelize;
 
 // INDEX ROUTE
 // FIND ALL STAGES
 stages.get("/", async (req, res) => {
   try {
-    const foundStages = await Event.findAll({
+    const foundStages = await Stage.findAll({
       order: [["available_start_time", "ASC"]],
       where: {
         name: { [Op.like]: `%${req.query.name ? req.query.name : ""}%` },
@@ -30,11 +30,11 @@ stages.get("/:name", async (req, res) => {
           model: MeetGreet,
           as: "meet_greets",
           include: {
-            model: Event,
-            as: "event",
+            model: Stage,
+            as: "stage",
             where: {
               name: {
-                [Op.like]: `%${req.query.event ? req.query.event : ""}%`,
+                [Op.like]: `%${req.query.stage ? req.query.stage : ""}%`,
               },
             },
           },
@@ -43,11 +43,11 @@ stages.get("/:name", async (req, res) => {
           model: SetTime,
           as: "set_times",
           include: {
-            model: Event,
-            as: "event",
+            model: Stage,
+            as: "stage",
             where: {
               name: {
-                [Op.like]: `%${req.query.event ? req.query.event : ""}%`,
+                [Op.like]: `%${req.query.stage ? req.query.stage : ""}%`,
               },
             },
           },
@@ -63,7 +63,7 @@ stages.get("/:name", async (req, res) => {
 // CREATE ROUTE
 stages.post("/", async (req, res) => {
   try {
-    const newStage = await Event.create(req.body);
+    const newStage = await Stage.create(req.body);
     res.status(200).json({
       message: "Successfully inserted a new stage",
       data: newStage,
